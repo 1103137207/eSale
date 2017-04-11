@@ -5,14 +5,31 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
 </head>
 <body>
-    <div> <table>
+    <div>
+        <table class="table table-condensed">
         <tr>
+            <td>訂單編號</td>
             <td>客戶名稱</td>
-            <td>@ViewBag.aa</td>
+            <td>訂購日期</td>
+            <td>發貨日期</td>
+            <td></td>
+            <td></td>
         </tr>
-        </table>
+         <tr>
+                <td>@ViewBag.OrderID</td>
+                <td>@ViewBag.CompanyName</td>
+                <td>@ViewBag.OrderDate</td>
+                <td>@ViewBag.RequiredDate</td>
+                <td>修改</td>
+                <td>刪除</td>
+            </tr> 
+        
+         </table>
         
     </div>
 </body>

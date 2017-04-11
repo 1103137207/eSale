@@ -20,7 +20,7 @@ namespace eSale.Models
         /// <summary>
         /// 客戶名稱
         /// </summary>
-        public string ContactName { get; set; }
+        public string CompanyName { get; set; }
 
         /// <summary>
         /// 業務(員工)代號
@@ -40,7 +40,7 @@ namespace eSale.Models
         /// <summary>
         /// 需要日期
         /// </summary>
-        public DateTime? RequireDdate { get; set; }
+        public DateTime? RequiredDate { get; set; }
 
         /// <summary>
         /// 出貨日期

@@ -25,15 +25,16 @@ namespace eSale.Models
         public Models.Orders GetOrdersById(string orderId)
         {
             DataTable dt = new DataTable();
+             
             string sql = @"select a.[OrderID],a.[CustomerID],b.CompanyName ,a.[EmployeeID],c.LastName+c.FirstName as Empname,
-		                    a.[OrderDate],a.[RequiredDate],a.[ShippedDate],a.[ShipperID],d.CompanyName,a.[Freight],
+		                    a.[OrderDate],a.[RequiredDate],a.[ShippedDate],a.[ShipperID],d.CompanyName as ShipperName,a.[Freight],
 		                    a.[ShipName],a.[ShipAddress],a.[ShipCity],a.[ShipRegion],
 		                    a.[ShipPostalCode],a.[ShipCountry]
                             from Sales.Orders As a
                             Inner Join Sales.Customers As b ON a.CustomerID=b.CustomerID
                             Inner Join HR.Employees As c ON a.EmployeeID=c.EmployeeID
                             Inner Join Sales.Shippers As d ON a.ShipperID=d.ShipperID
-                            where A.OrderID=@OrderId";
+                            ";
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
@@ -57,20 +58,20 @@ namespace eSale.Models
                 result.Add(new Orders()
                 {
                     CustomerID = (int)row["CustomerID"],
-                    ///ContactName = row["ContactName"].ToString(),
+                    CompanyName = row["CompanyName"].ToString(),
                     EmployeeID = (int)row["EmployeeID"],
                     ///FirstName = row["FirstName"].ToString(),
                     Freight  = (decimal)row["Freight"],
                     OrderDate = row["OrderDate"] ==DBNull.Value?(DateTime?)null : (DateTime)row["OrderDate"],
                     OrderID = (int)row["OrderID"],
-                    RequireDdate = row["RequireDdate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["RequireDdate"],
+                    RequiredDate = row["RequiredDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["RequiredDate"],
                     ShipAddress = row["ShipAddress"].ToString(),
                     ShipCity = row["ShipCity"].ToString(),
                     ShipCountry = row["ShipCountry"].ToString(),
                     ShipName = row["ShipName"].ToString(),
                     ShippedDate = row["ShippedDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["ShippedDate"],
                     ShipperID = (int)row["ShipperID"],
-                    ///ShipperName = row["ShipperName"].ToString(),
+                    ShipperName = row["ShipperName"].ToString(),
                     ShipPostalCode = row["ShipPostalCode"].ToString(),
                     ShipRegion = row["ShipRegion"].ToString(),
 
@@ -94,8 +95,8 @@ namespace eSale.Models
         {
             //todo
             List<Models.Orders> result = new List<Orders>();
-            result.Add(new Orders() { CustomerID = 1, ContactName = "叡揚資訊", EmployeeID = 1, FirstName = "王小明", OrderDate = DateTime.Parse("2015/11/08") });
-            result.Add(new Orders() { CustomerID = 2, ContactName = "網軟資訊", EmployeeID = 2, FirstName = "李小華", OrderDate = DateTime.Parse("2015/11/01") });
+            result.Add(new Orders() { CustomerID = 1, CompanyName = "叡揚資訊", EmployeeID = 1, FirstName = "王小明", OrderDate = DateTime.Parse("2015/11/08") });
+            result.Add(new Orders() { CustomerID = 2, CompanyName = "網軟資訊", EmployeeID = 2, FirstName = "李小華", OrderDate = DateTime.Parse("2015/11/01") });
             return result;
         }
         /// <summary>

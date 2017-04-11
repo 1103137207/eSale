@@ -13,7 +13,10 @@ namespace eSale.Controllers
         {
             Models.OrdersService orderService = new Models.OrdersService();
             var aa=orderService.GetOrdersById("10250");
-            ViewBag.aa = aa.CustomerID;
+            ViewBag.OrderID = aa.OrderID;
+            ViewBag.CompanyName = aa.CompanyName;
+            ViewBag.OrderDate = aa.OrderDate;
+            ViewBag.RequiredDate = aa.RequiredDate;
             return View();
         }
     }
