@@ -11,6 +11,72 @@
 </head>
 <body>
     <div>
+        @using (Html.BeginForm("Index", "Orders", FormMethod.Post, new { id = "Form1" }))
+        {
+            <table>
+                 <tr><td><label>訂單編號</label></td>
+                    <td>
+                        @Html.TextBox("OrderID")
+                    </td>
+                    <tr>
+                        <td>
+                            <label>客戶名稱</label>
+                        </td>
+                        <td>
+                             @Html.TextBox("CompanyName")
+                         </td>
+                    </tr>
+                <tr>
+                    <td>
+                        <label>負責員工</label>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(Models => Models.Empname, (List<SelectListItem>)ViewData["CodeTableData"])
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>出貨公司</label>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(Models => Models.ShipName, (List<SelectListItem>)ViewData["CodeTableData"])
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>訂購日期</label>
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(Models => Models.OrderDate, new { @type = "date" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>需要日期</label>
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(Models => Models.RequiredDate, new { @type = "date" })
+                    </td>
+                    <td>
+                        <label>出貨日期</label>
+                    </td>
+                    <td>
+                        @Html.TextBoxFor(Models => Models.ShippedDate, new { @type = "date" })
+                    </td>
+                </tr>
+                            <tr>
+                                <td>
+                                <input type="submit" value="查詢">
+                                <input type="reset" value="清除">
+                                </td>
+                            </tr>
+             
+            </table>
+  
+
+
+
+
         <table class="table table-condensed">
         <tr>
             <td>訂單編號</td>
@@ -20,17 +86,21 @@
             <td></td>
             <td></td>
         </tr>
-         <tr>
-                <td>@ViewBag.OrderID</td>
-                <td>@ViewBag.CompanyName</td>
-                <td>@ViewBag.OrderDate</td>
-                <td>@ViewBag.RequiredDate</td>
+@foreach (var item in (List<eSale.Models.Orders>)ViewBag.data)
+{
+            <tr>
+
+                <td>@item.OrderID</td>
+                <td>@item.CompanyName</td>
+                <td>@item.OrderDate</td>
+                <td>@item.RequiredDate</td>
                 <td>修改</td>
                 <td>刪除</td>
-            </tr> 
+            </tr>
+}
         
          </table>
-        
+        }
     </div>
 </body>
 </html>

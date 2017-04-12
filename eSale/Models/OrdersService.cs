@@ -22,7 +22,7 @@ namespace eSale.Models
         /// 依照Id 取得訂單資料
         /// </summary>
         /// <returns></returns>
-        public Models.Orders GetOrdersById(string orderId)
+        public List<Models.Orders> GetOrdersById(string OrderID)
         {
             DataTable dt = new DataTable();
              
@@ -34,19 +34,20 @@ namespace eSale.Models
                             Inner Join Sales.Customers As b ON a.CustomerID=b.CustomerID
                             Inner Join HR.Employees As c ON a.EmployeeID=c.EmployeeID
                             Inner Join Sales.Shippers As d ON a.ShipperID=d.ShipperID
+                            
                             ";
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql,conn);
-                cmd.Parameters.Add(new SqlParameter("@OrderId", orderId));
+                cmd.Parameters.Add(new SqlParameter("@OrderID", OrderID));
 
                 SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
                 sqlAdapter.Fill(dt);
                 conn.Close();
             }
-            return this.MapOrderDataToList(dt).FirstOrDefault();
+            return MapOrderDataToList(dt);
         }
 
         private List<Models.Orders> MapOrderDataToList(DataTable orderData)
@@ -60,7 +61,7 @@ namespace eSale.Models
                     CustomerID = (int)row["CustomerID"],
                     CompanyName = row["CompanyName"].ToString(),
                     EmployeeID = (int)row["EmployeeID"],
-                    ///FirstName = row["FirstName"].ToString(),
+                    Empname = row["Empname"].ToString(),
                     Freight  = (decimal)row["Freight"],
                     OrderDate = row["OrderDate"] ==DBNull.Value?(DateTime?)null : (DateTime)row["OrderDate"],
                     OrderID = (int)row["OrderID"],
@@ -91,12 +92,12 @@ namespace eSale.Models
         /// 依照條件取得訂單資料
         /// </summary>
         /// <returns></returns>
-        public List<Models.Orders> GetOrdersByCondtioin()
+        public List<Models.Orders> GetOrders()
         {
             //todo
             List<Models.Orders> result = new List<Orders>();
-            result.Add(new Orders() { CustomerID = 1, CompanyName = "叡揚資訊", EmployeeID = 1, FirstName = "王小明", OrderDate = DateTime.Parse("2015/11/08") });
-            result.Add(new Orders() { CustomerID = 2, CompanyName = "網軟資訊", EmployeeID = 2, FirstName = "李小華", OrderDate = DateTime.Parse("2015/11/01") });
+            result.Add(new Orders() { CustomerID = 1, CompanyName = "叡揚資訊", EmployeeID = 1, Empname = "王小明", OrderDate = DateTime.Parse("2015/11/08") });
+            result.Add(new Orders() { CustomerID = 2, CompanyName = "網軟資訊", EmployeeID = 2, Empname = "李小華", OrderDate = DateTime.Parse("2015/11/01") });
             return result;
         }
         /// <summary>

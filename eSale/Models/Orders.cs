@@ -30,7 +30,7 @@ namespace eSale.Models
         /// <summary>
         /// 業務(員工姓名)
         /// </summary>
-        public string FirstName { get; set; }
+        public string Empname { get; set; }
 
         /// <summary>
         /// 訂單日期
