@@ -18,11 +18,12 @@ namespace eSale.Models
         {
             //todo
         }
+
         /// <summary>
         /// 依照Id 取得訂單資料
         /// </summary>
         /// <returns></returns>
-        public List<Models.Orders> GetOrdersById(string OrderID)
+        public List<Models.Orders> GetOrdersById(Orders selectitem)
         {
             DataTable dt = new DataTable();
              
@@ -34,17 +35,25 @@ namespace eSale.Models
                             Inner Join Sales.Customers As b ON a.CustomerID=b.CustomerID
                             Inner Join HR.Employees As c ON a.EmployeeID=c.EmployeeID
                             Inner Join Sales.Shippers As d ON a.ShipperID=d.ShipperID
-                            
+                            where (a.OrderID LIKE @OrderID OR @OrderID='') AND (b.CompanyName LIKE '%@CompanyName%' OR @CompanyName='') AND (a.EmployeeID LIKE @EmployeeID OR @EmployeeID='')
+                            AND (a.ShipperID LIKE @ShipperID OR @ShipperID='') AND (a.OrderDate = @OrderDate OR @OrderDate='') AND (a.ShippedDate = @ShippedDate OR @ShippedDate='')
+                            AND (a.RequiredDate = @RequiredDate OR @RequiredDate='')
                             ";
 
             using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql,conn);
-                cmd.Parameters.Add(new SqlParameter("@OrderID", OrderID));
+                cmd.Parameters.Add(new SqlParameter("@OrderID", selectitem.OrderID));
+                cmd.Parameters.Add(new SqlParameter("@CompanyName", selectitem.CompanyName == null ? string.Empty : selectitem.CompanyName));
+                cmd.Parameters.Add(new SqlParameter("@EmployeeID", selectitem.EmployeeID ));
+                cmd.Parameters.Add(new SqlParameter("@ShipperID", selectitem.ShipperID));
+                cmd.Parameters.Add(new SqlParameter("@OrderDate", selectitem.OrderDate.ToString() == "" ? string.Empty : string.Format("{0:yyyy-MM-dd}",selectitem.OrderDate)));                
+                cmd.Parameters.Add(new SqlParameter("@RequiredDate", selectitem.RequiredDate.ToString() == "" ? string.Empty : string.Format("{0:yyyy-MM-dd}", selectitem.RequiredDate)));
+                cmd.Parameters.Add(new SqlParameter("@ShippedDate", selectitem.ShippedDate.ToString() == "" ? string.Empty : string.Format("{0:yyyy-MM-dd}", selectitem.ShippedDate)));
 
                 SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
-                sqlAdapter.Fill(dt);
+               sqlAdapter.Fill(dt);
                 conn.Close();
             }
             return MapOrderDataToList(dt);
@@ -62,8 +71,8 @@ namespace eSale.Models
                     CompanyName = row["CompanyName"].ToString(),
                     EmployeeID = (int)row["EmployeeID"],
                     Empname = row["Empname"].ToString(),
-                    Freight  = (decimal)row["Freight"],
-                    OrderDate = row["OrderDate"] ==DBNull.Value?(DateTime?)null : (DateTime)row["OrderDate"],
+                    Freight = (decimal)row["Freight"],
+                    OrderDate = row["OrderDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["OrderDate"],
                     OrderID = (int)row["OrderID"],
                     RequiredDate = row["RequiredDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["RequiredDate"],
                     ShipAddress = row["ShipAddress"].ToString(),
@@ -103,16 +112,91 @@ namespace eSale.Models
         /// <summary>
         /// 刪除訂單
         /// </summary>
-        public void DeleteOrdersById(string orderId)
+        public void DeleteOrdersById(string OrderID)
         {
-            //todo
+            string sql = "@Delete From Sales.Orders Where OrderID=@OrderID";
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.Add(new SqlParameter("@OrderID", OrderID));
+
+                conn.Close();
+            };
         }
+            
         /// <summary>
         /// 更新訂單
         /// </summary>
         public void UpdateOrders(Models.Orders order)
         {
             //todo
+        }
+        public List<Models.Orders> GetEmpname()
+        {
+            DataTable dt = new DataTable();
+            string sql = @"select EmployeeID,LastName+FirstName as Empname
+		                   From HR.Employees ";
+
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+            return MapEmpData(dt);
+        }
+
+        private List<Models.Orders> MapEmpData(DataTable empData)
+        {
+            List<Models.Orders> result1 = new List<Orders>();
+
+            foreach (DataRow row in empData.Rows)
+            {
+                result1.Add(new Orders()
+                {
+                    EmployeeID = (int)row["EmployeeID"],
+                    Empname = row["Empname"].ToString(),
+                });
+            }
+            return result1;
+        
+    }
+        public List<Models.Orders> GetShipperName()
+        {
+            DataTable dt = new DataTable();
+            string sql = @"select ShipperID,CompanyName as ShipperName
+		                   From Sales.Shippers ";
+
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(sql, conn);
+
+                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
+                sqlAdapter.Fill(dt);
+                conn.Close();
+            }
+            return MapShipperName(dt);
+        }
+
+        private List<Models.Orders> MapShipperName(DataTable ShipData)
+        {
+            List<Models.Orders> result2 = new List<Orders>();
+
+            foreach (DataRow row in ShipData.Rows)
+            {
+                result2.Add(new Orders()
+                {
+                    ShipperID = (int)row["ShipperID"],
+                    ShipperName = row["ShipperName"].ToString()
+                });
+            }
+            return result2;
+
         }
 
     }

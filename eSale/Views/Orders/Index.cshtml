@@ -31,7 +31,7 @@
                         <label>負責員工</label>
                     </td>
                     <td>
-                        @Html.DropDownListFor(Models => Models.Empname, (List<SelectListItem>)ViewData["CodeTableData"])
+                        @Html.DropDownListFor(Models => Models.EmployeeID, (List<SelectListItem>)ViewBag.empData)
                     </td>
                 </tr>
                 <tr>
@@ -39,7 +39,7 @@
                         <label>出貨公司</label>
                     </td>
                     <td>
-                        @Html.DropDownListFor(Models => Models.ShipName, (List<SelectListItem>)ViewData["CodeTableData"])
+                       @Html.DropDownListFor(Models => Models.ShipperID, (List<SelectListItem>)ViewBag.shipData)
                     </td>
                 </tr>
                 <tr>
@@ -93,9 +93,11 @@
                 <td>@item.OrderID</td>
                 <td>@item.CompanyName</td>
                 <td>@item.OrderDate</td>
-                <td>@item.RequiredDate</td>
+                <td>@item.ShippedDate</td>
                 <td>修改</td>
-                <td>刪除</td>
+                <td>
+                 @Html.ActionLink("刪除", "index", new { id = @item.OrderID })
+                </td>
             </tr>
 }
         

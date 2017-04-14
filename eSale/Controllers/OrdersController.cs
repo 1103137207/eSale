@@ -10,30 +10,43 @@ namespace eSale.Controllers
     public class OrdersController : Controller
     {
         // GET: Orders
-        public ActionResult Index(Orders selectitem)
+        public ActionResult Index(Models.Orders selectitem)
         {
             Models.OrdersService ordersService = new Models.OrdersService();
-            ViewBag.data = ordersService.GetOrdersById("OrderID");
-
-            CodeTableService CodeTableService = new CodeTableService();
-            List<CodeTable> result1 = CodeTableService.GetTitle();
-            List<SelectListItem> CodeTableData = new List<SelectListItem>();
-            CodeTableData.Add(new SelectListItem()
+            ViewBag.data = ordersService.GetOrdersById(selectitem);
+            
+            List<SelectListItem> empData = new List<SelectListItem>();
+            var result1 = ordersService.GetEmpname();
+            empData.Add(new SelectListItem()
             {
                 Text = "",
                 Value = null
             });
-            foreach (var item1 in result1)
+            foreach (var item in result1)
+            empData.Add(new SelectListItem()
             {
-                CodeTableData.Add(new SelectListItem()
+                Text =item.Empname.ToString(),
+                Value = item.EmployeeID.ToString()
+            });
+            ViewBag.empData= empData;
+
+            List<SelectListItem> shipData = new List<SelectListItem>();
+            var result2 = ordersService.GetShipperName();
+            shipData.Add(new SelectListItem()
+            {
+                Text = "",
+                Value = null
+            });
+            foreach (var item in result2)
+                shipData.Add(new SelectListItem()
                 {
-                    Text = item1.CodeVal.ToString(),
-                    Value = item1.CodeId.ToString()
+                    Text = item.ShipperName.ToString(),
+                    Value = item.ShipperID.ToString()
                 });
-                ViewData["CodeTableData"] = CodeTableData;
-            }
+            ViewBag.shipData = shipData;
 
             return View();
         }
+     
     }
 }
