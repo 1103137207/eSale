@@ -35,7 +35,7 @@ namespace eSale.Models
                             Inner Join Sales.Customers As b ON a.CustomerID=b.CustomerID
                             Inner Join HR.Employees As c ON a.EmployeeID=c.EmployeeID
                             Inner Join Sales.Shippers As d ON a.ShipperID=d.ShipperID
-                            where (a.OrderID LIKE @OrderID OR @OrderID='') AND (b.CompanyName LIKE '%@CompanyName%' OR @CompanyName='') AND (a.EmployeeID LIKE @EmployeeID OR @EmployeeID='')
+                            where (a.OrderID LIKE '%@OrderID%' OR @OrderID='') AND (b.CompanyName LIKE '%@CompanyName%' OR @CompanyName='') AND (a.EmployeeID LIKE @EmployeeID OR @EmployeeID='')
                             AND (a.ShipperID LIKE @ShipperID OR @ShipperID='') AND (a.OrderDate = @OrderDate OR @OrderDate='') AND (a.ShippedDate = @ShippedDate OR @ShippedDate='')
                             AND (a.RequiredDate = @RequiredDate OR @RequiredDate='')
                             ";
@@ -44,7 +44,7 @@ namespace eSale.Models
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql,conn);
-                cmd.Parameters.Add(new SqlParameter("@OrderID", selectitem.OrderID));
+                cmd.Parameters.Add(new SqlParameter("@OrderID", selectitem.OrderID == null ? string.Empty : selectitem.OrderID));
                 cmd.Parameters.Add(new SqlParameter("@CompanyName", selectitem.CompanyName == null ? string.Empty : selectitem.CompanyName));
                 cmd.Parameters.Add(new SqlParameter("@EmployeeID", selectitem.EmployeeID ));
                 cmd.Parameters.Add(new SqlParameter("@ShipperID", selectitem.ShipperID));
@@ -58,6 +58,8 @@ namespace eSale.Models
             }
             return MapOrderDataToList(dt);
         }
+
+        
 
         private List<Models.Orders> MapOrderDataToList(DataTable orderData)
         {
@@ -73,7 +75,7 @@ namespace eSale.Models
                     Empname = row["Empname"].ToString(),
                     Freight = (decimal)row["Freight"],
                     OrderDate = row["OrderDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["OrderDate"],
-                    OrderID = (int)row["OrderID"],
+                    OrderID = row["OrderID"].ToString(),
                     RequiredDate = row["RequiredDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["RequiredDate"],
                     ShipAddress = row["ShipAddress"].ToString(),
                     ShipCity = row["ShipCity"].ToString(),
@@ -96,33 +98,38 @@ namespace eSale.Models
             return System.Configuration.ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString.ToString();
         }
 
-
-        /// <summary>
-        /// 依照條件取得訂單資料
-        /// </summary>
-        /// <returns></returns>
-        public List<Models.Orders> GetOrders()
-        {
-            //todo
-            List<Models.Orders> result = new List<Orders>();
-            result.Add(new Orders() { CustomerID = 1, CompanyName = "叡揚資訊", EmployeeID = 1, Empname = "王小明", OrderDate = DateTime.Parse("2015/11/08") });
-            result.Add(new Orders() { CustomerID = 2, CompanyName = "網軟資訊", EmployeeID = 2, Empname = "李小華", OrderDate = DateTime.Parse("2015/11/01") });
-            return result;
-        }
         /// <summary>
         /// 刪除訂單
         /// </summary>
         public void DeleteOrdersById(string OrderID)
         {
-            string sql = "@Delete From Sales.Orders Where OrderID=@OrderID";
-            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.Add(new SqlParameter("@OrderID", OrderID));
 
-                conn.Close();
-            };
+            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
+                try
+                {
+                    {
+                        conn.Open();
+                        string sql = @"Delete From Sales.OrderDetails Where OrderID=@OrderID";
+                        SqlCommand cmd = new SqlCommand(sql, conn);
+                        cmd.Parameters.Add(new SqlParameter("@OrderID", OrderID));
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+
+                        conn.Open();
+                       
+                        string sql2 = @"Delete From Sales.Orders Where OrderID=@OrderID";
+                        SqlCommand cmd2 = new SqlCommand(sql2, conn);
+                        cmd2.Parameters.Add(new SqlParameter("@OrderID", OrderID));
+                        cmd2.ExecuteNonQuery();
+                        conn.Close();
+
+
+                    };
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
         }
             
         /// <summary>
@@ -132,73 +139,8 @@ namespace eSale.Models
         {
             //todo
         }
-        public List<Models.Orders> GetEmpname()
-        {
-            DataTable dt = new DataTable();
-            string sql = @"select EmployeeID,LastName+FirstName as Empname
-		                   From HR.Employees ";
 
-            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                
-                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
-                sqlAdapter.Fill(dt);
-                conn.Close();
-            }
-            return MapEmpData(dt);
-        }
-
-        private List<Models.Orders> MapEmpData(DataTable empData)
-        {
-            List<Models.Orders> result1 = new List<Orders>();
-
-            foreach (DataRow row in empData.Rows)
-            {
-                result1.Add(new Orders()
-                {
-                    EmployeeID = (int)row["EmployeeID"],
-                    Empname = row["Empname"].ToString(),
-                });
-            }
-            return result1;
-        
+      
     }
-        public List<Models.Orders> GetShipperName()
-        {
-            DataTable dt = new DataTable();
-            string sql = @"select ShipperID,CompanyName as ShipperName
-		                   From Sales.Shippers ";
 
-            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
-
-                SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd);
-                sqlAdapter.Fill(dt);
-                conn.Close();
-            }
-            return MapShipperName(dt);
-        }
-
-        private List<Models.Orders> MapShipperName(DataTable ShipData)
-        {
-            List<Models.Orders> result2 = new List<Orders>();
-
-            foreach (DataRow row in ShipData.Rows)
-            {
-                result2.Add(new Orders()
-                {
-                    ShipperID = (int)row["ShipperID"],
-                    ShipperName = row["ShipperName"].ToString()
-                });
-            }
-            return result2;
-
-        }
-
-    }
-    
 }

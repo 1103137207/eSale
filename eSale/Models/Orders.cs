@@ -8,9 +8,19 @@ namespace eSale.Models
     public class Orders
     {
         /// <summary>
+        /// 建構式
+        /// </summary>
+        public Orders()
+        {
+            var ods = new List<Models.OrderDetails>();
+            ods.Add(new OrderDetails() { ProductID = 58 });
+            this.OrderDetails = ods;
+
+        }
+        /// <summary>
         /// 訂單編號
         /// </summary>
-        public int OrderID { get; set; }
+        public string OrderID { get; set; }
 
         /// <summary>
         /// 客戶代號
@@ -91,5 +101,10 @@ namespace eSale.Models
         /// 出貨國家
         /// </summary>
         public string ShipCountry { get; set; }
+
+        /// <summary>
+        /// 訂單明細
+        /// </summary>
+        public List<OrderDetails> OrderDetails { get; set; }
     }
 }

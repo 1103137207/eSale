@@ -16,14 +16,14 @@
             <table>
                  <tr><td><label>訂單編號</label></td>
                     <td>
-                        @Html.TextBox("OrderID")
+                        @Html.TextBoxFor(model=>model.OrderID)
                     </td>
                     <tr>
                         <td>
                             <label>客戶名稱</label>
                         </td>
                         <td>
-                             @Html.TextBox("CompanyName")
+                             @Html.TextBoxFor(model=>model.CompanyName)
                          </td>
                     </tr>
                 <tr>
@@ -40,7 +40,6 @@
                     </td>
                     <td>
                        @Html.DropDownListFor(Models => Models.ShipperID, (List<SelectListItem>)ViewBag.shipData)
-                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -68,6 +67,7 @@
                                 <td>
                                 <input type="submit" value="查詢">
                                 <input type="reset" value="清除">
+                                    @Html.ActionLink("新增訂單","InsertIndex")
                                 </td>
                             </tr>
              
@@ -96,7 +96,9 @@
                 <td>@item.ShippedDate</td>
                 <td>修改</td>
                 <td>
-                 @Html.ActionLink("刪除", "index", new { id = @item.OrderID })
+                <td>
+                    <a class="btnDelete" href="#">刪除</a>
+                    <input class="hidOrderId" type="hidden" value='@item.OrderID' />                                 
                 </td>
             </tr>
 }
@@ -104,5 +106,27 @@
          </table>
         }
     </div>
+
+    <script type="text/javascript">
+
+
+        $(".btnDelete").click(function (e) {
+
+            var tr = $(this).closest('tr')
+            $.ajax({
+                type: "POST",
+                url: "/Orders/DeleteOrders",
+                data: "OrderID=" + $(this).next().val(),
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    $(tr).remove();
+                }
+            });
+            return false;
+        });
+
+    </script>
+
 </body>
 </html>

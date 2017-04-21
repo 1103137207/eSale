@@ -8,45 +8,50 @@ using System.Web.Mvc;
 namespace eSale.Controllers
 {
     public class OrdersController : Controller
+
     {
+        Models.OrdersService ordersService = new Models.OrdersService();
+        Models.CodeService codeService = new Models.CodeService();
         // GET: Orders
         public ActionResult Index(Models.Orders selectitem)
         {
-            Models.OrdersService ordersService = new Models.OrdersService();
-            ViewBag.data = ordersService.GetOrdersById(selectitem);
             
-            List<SelectListItem> empData = new List<SelectListItem>();
-            var result1 = ordersService.GetEmpname();
-            empData.Add(new SelectListItem()
-            {
-                Text = "",
-                Value = null
-            });
-            foreach (var item in result1)
-            empData.Add(new SelectListItem()
-            {
-                Text =item.Empname.ToString(),
-                Value = item.EmployeeID.ToString()
-            });
-            ViewBag.empData= empData;
+            ViewBag.data = ordersService.GetOrdersById(selectitem);
 
-            List<SelectListItem> shipData = new List<SelectListItem>();
-            var result2 = ordersService.GetShipperName();
-            shipData.Add(new SelectListItem()
-            {
-                Text = "",
-                Value = null
-            });
-            foreach (var item in result2)
-                shipData.Add(new SelectListItem()
-                {
-                    Text = item.ShipperName.ToString(),
-                    Value = item.ShipperID.ToString()
-                });
-            ViewBag.shipData = shipData;
-
-            return View();
+            ViewBag.CompanyName = this.codeService.GetCustomer();
+            ViewBag.empData = this.codeService.GetEmpname();
+            ViewBag.shipData = this.codeService.GetShipperName();
+            ViewBag.ProductCodeData = this.codeService.GetProduct();
+            return View(new Models.Orders());
         }
-     
+        [HttpPost()]
+        public JsonResult DeleteOrders(string OrderID)
+        {
+
+            try
+            {
+
+                Models.OrdersService OrdersService = new Models.OrdersService();
+                OrdersService.DeleteOrdersById(OrderID);
+
+                return this.Json(true);
+            }
+            catch (Exception)
+            {
+                return this.Json(false);
+            }
+        }
+        public ActionResult InsertIndex(Models.Orders selectitem)
+        {
+            Models.OrdersService ordersService = new Models.OrdersService();
+            Models.CodeService codeService = new Models.CodeService();
+
+            ViewBag.CompanyName = this.codeService.GetCustomer();
+            ViewBag.empData = this.codeService.GetEmpname();
+            ViewBag.shipData = this.codeService.GetShipperName();
+            ViewBag.ProductCodeData = this.codeService.GetProduct();
+            return View(new Models.Orders());
+
+        }
     }
 }
